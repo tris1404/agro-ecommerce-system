@@ -1,5 +1,6 @@
 package com.agro.agroecommerce.service;
 
+import com.agro.agroecommerce.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -7,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +16,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
 public class JwtService {
-    @Value("${security.jwt.secret-key}")
+    @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration;
+    @Value("${jwt.access.expiration}")
+    private long accessTokenExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -33,16 +36,25 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateAccessToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        if (userDetails instanceof User) {
+            User user = (User) userDetails;
+            claims.put("userId", user.getId());
+            claims.put("email", user.getEmail());
+            claims.put("roles", userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()));
+        }
+        return buildToken(claims, userDetails, accessTokenExpiration);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
+        return buildToken(extraClaims, userDetails, accessTokenExpiration);
     }
 
-    public long getExpirationTime() {
-        return jwtExpiration;
+    public long getAccessTokenExpiration() {
+        return accessTokenExpiration;
     }
 
     private String buildToken(
