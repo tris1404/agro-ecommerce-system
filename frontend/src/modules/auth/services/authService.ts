@@ -6,9 +6,14 @@ interface LoginResponse {
 }
 
 interface RegisterData {
-    name: string;
+    username: string;
     email: string;
     password: string;
+}
+
+interface VerifyData {
+    email: string;
+    verificationCode: string;
 }
 
 interface LoginData {
@@ -25,7 +30,12 @@ const authService = {
 
     // Register new user
     register: async (data: RegisterData): Promise<void> => {
-        await axiosClient.post('/auth/register', data);
+        await axiosClient.post('/auth/signup', data);
+    },
+
+    // Verify user account
+    verify: async (data: VerifyData): Promise<void> => {
+        await axiosClient.post('/auth/verify', data);
     },
 
     // Logout user

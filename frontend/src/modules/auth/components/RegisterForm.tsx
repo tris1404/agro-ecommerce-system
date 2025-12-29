@@ -4,20 +4,20 @@ import Button from '../../core/components/Button';
 import useAuth from '../hooks/useAuth';
 
 const RegisterForm: React.FC = () => {
-    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [validationErrors, setValidationErrors] = useState<{ name?: string; email?: string; password?: string }>({});
+    const [validationErrors, setValidationErrors] = useState<{ username?: string; email?: string; password?: string }>({});
 
     const { register, isLoading, error } = useAuth();
 
     const validate = (): boolean => {
-        const errors: { name?: string; email?: string; password?: string } = {};
+        const errors: { username?: string; email?: string; password?: string } = {};
 
-        if (!name) {
-            errors.name = 'Name is required';
-        } else if (name.length < 2) {
-            errors.name = 'Name must be at least 2 characters';
+        if (!username) {
+            errors.username = 'Username is required';
+        } else if (username.length < 2) {
+            errors.username = 'Username must be at least 2 characters';
         }
 
         if (!email) {
@@ -44,7 +44,7 @@ const RegisterForm: React.FC = () => {
         }
 
         try {
-            await register(name, email, password);
+            await register(username, email, password);
         } catch (err) {
             // Error is handled by useAuth hook
         }
@@ -60,11 +60,11 @@ const RegisterForm: React.FC = () => {
 
             <Input
                 type="text"
-                label="Name"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={validationErrors.name}
+                label="Username"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                error={validationErrors.username}
             />
 
             <Input

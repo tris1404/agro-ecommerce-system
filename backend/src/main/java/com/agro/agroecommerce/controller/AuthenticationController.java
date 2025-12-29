@@ -4,6 +4,7 @@ import com.agro.agroecommerce.dto.LoginUserDto;
 import com.agro.agroecommerce.dto.RegisterUserDto;
 import com.agro.agroecommerce.dto.VerifyUserDto;
 import com.agro.agroecommerce.dto.response.AuthResponse;
+import com.agro.agroecommerce.dto.response.RegisterResponse;
 import com.agro.agroecommerce.entity.RefreshToken;
 import com.agro.agroecommerce.entity.User;
 import com.agro.agroecommerce.exception.TokenRefreshException;
@@ -27,34 +28,38 @@ public class AuthenticationController {
     private final RefreshTokenService refreshTokenService;
 
     public AuthenticationController(
-            JwtService jwtService, 
+            JwtService jwtService,
             AuthenticationService authenticationService,
-            RefreshTokenService refreshTokenService
-    ) {
+            RefreshTokenService refreshTokenService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
         this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signup(registerUserDto);
-        return ResponseEntity.ok(registeredUser);
+
+        RegisterResponse response = new RegisterResponse(
+                registeredUser.getId(),
+                registeredUser.getUsername(),
+                registeredUser.getEmail());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticate(
             @RequestBody LoginUserDto loginUserDto,
-            HttpServletResponse response
-    ) {
+            HttpServletResponse response) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
-        
+
         // Generate access token
         String accessToken = jwtService.generateAccessToken(authenticatedUser);
-        
+
         // Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(authenticatedUser.getId());
-        
+
         // Set refresh token in HttpOnly cookie
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken.getToken());
         refreshTokenCookie.setHttpOnly(true);
@@ -62,14 +67,13 @@ public class AuthenticationController {
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
         response.addCookie(refreshTokenCookie);
-        
+
         AuthResponse authResponse = new AuthResponse(
                 accessToken,
                 jwtService.getAccessTokenExpiration(),
                 authenticatedUser.getUsername(),
-                authenticatedUser.getEmail()
-        );
-        
+                authenticatedUser.getEmail());
+
         return ResponseEntity.ok(authResponse);
     }
 
@@ -85,32 +89,31 @@ public class AuthenticationController {
                         .map(Cookie::getValue)
                         .orElse(null);
             }
-            
+
             if (refreshToken == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Refresh token is missing");
             }
-            
+
             // Find and verify refresh token
             RefreshToken token = refreshTokenService.findByToken(refreshToken)
                     .orElseThrow(() -> new TokenRefreshException("Refresh token not found"));
-            
+
             token = refreshTokenService.verifyExpiration(token);
-            
+
             User user = token.getUser();
-            
+
             // Generate new access token
             String newAccessToken = jwtService.generateAccessToken(user);
-            
+
             AuthResponse authResponse = new AuthResponse(
                     newAccessToken,
                     jwtService.getAccessTokenExpiration(),
                     user.getUsername(),
-                    user.getEmail()
-            );
-            
+                    user.getEmail());
+
             return ResponseEntity.ok(authResponse);
-            
+
         } catch (TokenRefreshException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
@@ -128,12 +131,12 @@ public class AuthenticationController {
                         .map(Cookie::getValue)
                         .orElse(null);
             }
-            
+
             if (refreshToken != null) {
                 // Revoke the refresh token
                 refreshTokenService.revokeToken(refreshToken);
             }
-            
+
             // Clear the refresh token cookie
             Cookie refreshTokenCookie = new Cookie("refreshToken", null);
             refreshTokenCookie.setHttpOnly(true);
@@ -141,9 +144,9 @@ public class AuthenticationController {
             refreshTokenCookie.setPath("/");
             refreshTokenCookie.setMaxAge(0);
             response.addCookie(refreshTokenCookie);
-            
+
             return ResponseEntity.ok("Logged out successfully");
-            
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error during logout");

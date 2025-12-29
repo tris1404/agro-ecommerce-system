@@ -6,7 +6,7 @@ interface UseAuthReturn {
     isLoading: boolean;
     error: string | null;
     login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string) => Promise<void>;
+    register: (username: string, email: string, password: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -30,12 +30,12 @@ const useAuth = (): UseAuthReturn => {
         }
     };
 
-    const register = async (name: string, email: string, password: string) => {
+    const register = async (username: string, email: string, password: string) => {
         try {
             setIsLoading(true);
             setError(null);
-            await authService.register({ name, email, password });
-            navigate('/login');
+            await authService.register({ username, email, password });
+            navigate('/verify');  // Redirect to verify page instead of login
         } catch (err: any) {
             setError(err.response?.data?.message || 'Registration failed. Please try again.');
             throw err;
