@@ -1,5 +1,6 @@
 package com.agro.agroecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class Role {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
+    @JsonIgnore // Prevent circular reference when serializing to JSON
     private Set<User> users;
 
     public Role(String name) {
