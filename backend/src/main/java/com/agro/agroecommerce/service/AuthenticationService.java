@@ -3,34 +3,40 @@ package com.agro.agroecommerce.service;
 import com.agro.agroecommerce.dto.LoginUserDto;
 import com.agro.agroecommerce.dto.RegisterUserDto;
 import com.agro.agroecommerce.dto.VerifyUserDto;
+import com.agro.agroecommerce.entity.Role;
 import com.agro.agroecommerce.entity.User;
+import com.agro.agroecommerce.repository.RoleRepository;
 import com.agro.agroecommerce.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
 
     public AuthenticationService(
             UserRepository userRepository,
+            RoleRepository roleRepository,
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,
             EmailService emailService
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
     }
@@ -40,6 +46,14 @@ public class AuthenticationService {
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
+        
+        // Assign default ROLE_CUSTOMER to new users
+        Role customerRole = roleRepository.findByName("ROLE_CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Error: Role ROLE_CUSTOMER is not found."));
+        Set<Role> roles = new HashSet<>();
+        roles.add(customerRole);
+        user.setRoles(roles);
+        
         sendVerificationEmail(user);
         return userRepository.save(user);
     }
@@ -97,7 +111,7 @@ public class AuthenticationService {
         }
     }
 
-    private void sendVerificationEmail(User user) { //TODO: Update with company logo
+    private void sendVerificationEmail(User user) { 
         String subject = "Account Verification";
         String verificationCode = "VERIFICATION CODE " + user.getVerificationCode();
         String htmlMessage = "<html>"
