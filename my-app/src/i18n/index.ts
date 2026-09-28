@@ -1,0 +1,273 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export type Language = 'vi' | 'en';
+
+export const translations = {
+  vi: {
+    // Navigation
+    home: 'Trang chủ',
+    products: 'Sản phẩm',
+    categories: 'Danh mục',
+    cropProtection: 'Thuốc BVTV',
+    fertilizers: 'Phân bón',
+    seeds: 'Hạt giống',
+    sprayers: 'Thiết bị phun xịt',
+    brandStory: 'Về chúng tôi',
+    technicalGuides: 'Góc kỹ thuật nông nghiệp',
+    contact: 'Liên hệ',
+    searchPlaceholder: 'Tìm kiếm thuốc trừ sâu, phân bón, lúa giống...',
+    cart: 'Giỏ hàng',
+    account: 'Tài khoản',
+    login: 'Đăng nhập',
+    register: 'Đăng ký',
+    logout: 'Đăng xuất',
+    admin: 'Quản trị viên',
+
+    // Home
+    heroTitle: 'Giải Pháp Nông Nghiệp Bền Vững & Hiệu Quả',
+    heroSubtitle: 'Đồng hành cùng nhà nông với 100% vật tư chính hãng: Thuốc BVTV, Phân bón cao cấp, Hạt giống năng suất cao và Máy móc cơ giới hóa.',
+    shopNow: 'Mua ngay hôm nay',
+    viewCatalog: 'Xem toàn bộ sản phẩm',
+    featuredCategories: 'Danh Mục Vật Tư Nổi Bật',
+    featuredProducts: 'Sản Phẩm Bán Chạy',
+    newArrivals: 'Sản Phẩm Mới',
+    promotions: 'Khuyến Mãi Đặc Biệt',
+    allProducts: 'Tất cả',
+    addToCart: 'Thêm vào giỏ',
+    buyNow: 'Mua ngay',
+    price: 'Giá',
+    currency: '₫',
+    sold: 'Đã bán',
+    inStock: 'Còn hàng',
+    outOfStock: 'Tạm hết hàng',
+
+    // Product detail & Specs
+    specs: 'Thông số kỹ thuật',
+    description: 'Mô tả chi tiết',
+    reviews: 'Đánh giá từ nhà nông',
+    relatedProducts: 'Sản phẩm cùng loại',
+    activeIngredients: 'Hoạt chất',
+    concentration: 'Hàm lượng',
+    formulation: 'Dạng thuốc',
+    targetPests: 'Đối tượng phòng trừ',
+    dosage: 'Liều lượng khuyến cáo',
+    applicableCrops: 'Cây trồng áp dụng',
+    phi: 'Thời gian cách ly (PHI)',
+    toxicityLevel: 'Băng màu an toàn',
+    powerType: 'Động cơ / Nguồn điện',
+    capacity: 'Dung tích bình',
+    pressure: 'Áp lực phun',
+    warranty: 'Bảo hành',
+    selectVariant: 'Chọn quy cách',
+    quantity: 'Số lượng',
+    instructions: 'Hướng dẫn an toàn khi sử dụng',
+
+    // Filter
+    filterBy: 'Bộ lọc sản phẩm',
+    priceRange: 'Khoảng giá',
+    allPrices: 'Tất cả mức giá',
+    brand: 'Thương hiệu',
+    pestTarget: 'Phòng trừ sâu bệnh',
+    sortBy: 'Sắp xếp theo',
+    sortNewest: 'Mới nhất',
+    sortPriceAsc: 'Giá thấp đến cao',
+    sortPriceDesc: 'Giá cao đến thấp',
+    sortBestSeller: 'Bán chạy nhất',
+    applyFilter: 'Áp dụng',
+    resetFilter: 'Thiết lập lại',
+
+    // Cart & Checkout
+    cartEmpty: 'Giỏ hàng của bạn đang trống',
+    continueShopping: 'Tiếp tục mua sắm',
+    cartTotal: 'Tổng tiền giỏ hàng',
+    checkout: 'Tiến hành thanh toán',
+    shippingAddress: 'Thông tin giao hàng',
+    fullName: 'Họ và tên người nhận',
+    phone: 'Số điện thoại',
+    province: 'Tỉnh / Thành phố',
+    district: 'Quận / Huyện',
+    ward: 'Phường / Xã',
+    detailAddress: 'Địa chỉ cụ thể (Thôn/Xóm/Ấp/Đường)',
+    paymentMethod: 'Phương thức thanh toán',
+    cod: 'Thanh toán khi nhận hàng (COD)',
+    vnpay: 'Thanh toán trực tuyến qua VNPAY (ATM, QR Pay, Thẻ)',
+    shippingFee: 'Phí vận chuyển',
+    freeShipping: 'Miễn phí giao hàng cho đơn trên 1.000.000₫',
+    orderSummary: 'Tóm tắt đơn hàng',
+    orderConfirmation: 'Xác nhận đặt hàng',
+    orderSuccessTitle: 'Đặt hàng thành công!',
+    orderSuccessDesc: 'Cảm ơn quý khách đã tin tưởng AgroCare. Đơn hàng của bạn đang được điều phối.',
+    viewOrder: 'Xem chi tiết đơn hàng',
+
+    // Account & Orders
+    orderHistory: 'Lịch sử đơn hàng',
+    myProfile: 'Hồ sơ cá nhân',
+    addressBook: 'Sổ địa chỉ',
+    changePassword: 'Đổi mật khẩu',
+    orderStatusPending: 'Chờ xác nhận',
+    orderStatusConfirmed: 'Đã xác nhận',
+    orderStatusProcessing: 'Đang chuẩn bị hàng',
+    orderStatusShipping: 'Đang vận chuyển',
+    orderStatusCompleted: 'Hoàn thành',
+    orderStatusCancelled: 'Đã hủy',
+
+    // Admin
+    adminDashboard: 'Bảng điều khiển',
+    adminProducts: 'Quản lý sản phẩm',
+    adminOrders: 'Quản lý đơn hàng',
+    adminCustomers: 'Danh sách khách hàng',
+    revenue: 'Doanh thu',
+    ordersCount: 'Tổng số đơn',
+    totalCustomers: 'Tổng khách hàng',
+    addProduct: 'Thêm sản phẩm mới',
+    editProduct: 'Chỉnh sửa sản phẩm',
+    deleteProduct: 'Xóa sản phẩm',
+    save: 'Lưu thay đổi',
+    cancel: 'Hủy bỏ',
+  },
+  en: {
+    // Navigation
+    home: 'Home',
+    products: 'Products',
+    categories: 'Categories',
+    cropProtection: 'Crop Protection',
+    fertilizers: 'Fertilizers',
+    seeds: 'Seeds',
+    sprayers: 'Spraying Equipment',
+    brandStory: 'About Us',
+    technicalGuides: 'Agronomy Guides',
+    contact: 'Contact',
+    searchPlaceholder: 'Search pesticides, fertilizers, hybrid seeds...',
+    cart: 'Cart',
+    account: 'Account',
+    login: 'Login',
+    register: 'Register',
+    logout: 'Logout',
+    admin: 'Admin',
+
+    // Home
+    heroTitle: 'Sustainable & High-Yield Agricultural Solutions',
+    heroSubtitle: 'Supplying 100% authentic agricultural inputs: Crop protection, Premium fertilizers, High-yield seeds, and Modern spraying equipment.',
+    shopNow: 'Shop Now',
+    viewCatalog: 'Browse All Products',
+    featuredCategories: 'Featured Categories',
+    featuredProducts: 'Best Sellers',
+    newArrivals: 'New Arrivals',
+    promotions: 'Hot Deals',
+    allProducts: 'All',
+    addToCart: 'Add to Cart',
+    buyNow: 'Buy Now',
+    price: 'Price',
+    currency: '₫',
+    sold: 'Sold',
+    inStock: 'In Stock',
+    outOfStock: 'Out of Stock',
+
+    // Product detail & Specs
+    specs: 'Technical Specifications',
+    description: 'Detailed Description',
+    reviews: 'Farmer Reviews',
+    relatedProducts: 'Related Products',
+    activeIngredients: 'Active Ingredients',
+    concentration: 'Concentration',
+    formulation: 'Formulation',
+    targetPests: 'Target Pests / Diseases',
+    dosage: 'Recommended Dosage',
+    applicableCrops: 'Target Crops',
+    phi: 'Pre-Harvest Interval (PHI)',
+    toxicityLevel: 'Toxicity Band',
+    powerType: 'Engine / Power Type',
+    capacity: 'Tank Capacity',
+    pressure: 'Working Pressure',
+    warranty: 'Warranty',
+    selectVariant: 'Select Packaging',
+    quantity: 'Quantity',
+    instructions: 'Safety & Application Guidelines',
+
+    // Filter
+    filterBy: 'Filter Products',
+    priceRange: 'Price Range',
+    allPrices: 'All Prices',
+    brand: 'Brand',
+    pestTarget: 'Target Pests',
+    sortBy: 'Sort By',
+    sortNewest: 'Newest',
+    sortPriceAsc: 'Price: Low to High',
+    sortPriceDesc: 'Price: High to Low',
+    sortBestSeller: 'Best Sellers',
+    applyFilter: 'Apply',
+    resetFilter: 'Reset Filters',
+
+    // Cart & Checkout
+    cartEmpty: 'Your shopping cart is empty',
+    continueShopping: 'Continue Shopping',
+    cartTotal: 'Cart Total',
+    checkout: 'Proceed to Checkout',
+    shippingAddress: 'Shipping Details',
+    fullName: 'Recipient Full Name',
+    phone: 'Phone Number',
+    province: 'Province / City',
+    district: 'District',
+    ward: 'Ward / Commune',
+    detailAddress: 'Street address / Hamlet',
+    paymentMethod: 'Payment Method',
+    cod: 'Cash on Delivery (COD)',
+    vnpay: 'VNPAY Online Payment (ATM, QR, Cards)',
+    shippingFee: 'Shipping Fee',
+    freeShipping: 'Free shipping on orders over 1,000,000₫',
+    orderSummary: 'Order Summary',
+    orderConfirmation: 'Confirm Order',
+    orderSuccessTitle: 'Order Placed Successfully!',
+    orderSuccessDesc: 'Thank you for choosing AgroCare. Your order is being processed for dispatch.',
+    viewOrder: 'View Order Details',
+
+    // Account & Orders
+    orderHistory: 'Order History',
+    myProfile: 'My Profile',
+    addressBook: 'Address Book',
+    changePassword: 'Change Password',
+    orderStatusPending: 'Pending',
+    orderStatusConfirmed: 'Confirmed',
+    orderStatusProcessing: 'Processing',
+    orderStatusShipping: 'Shipping',
+    orderStatusCompleted: 'Completed',
+    orderStatusCancelled: 'Cancelled',
+
+    // Admin
+    adminDashboard: 'Dashboard',
+    adminProducts: 'Product Management',
+    adminOrders: 'Order Management',
+    adminCustomers: 'Customer Management',
+    revenue: 'Revenue',
+    ordersCount: 'Total Orders',
+    totalCustomers: 'Total Customers',
+    addProduct: 'Add New Product',
+    editProduct: 'Edit Product',
+    deleteProduct: 'Delete Product',
+    save: 'Save Changes',
+    cancel: 'Cancel',
+  }
+};
+
+interface I18nState {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: keyof typeof translations['vi']) => string;
+}
+
+export const useI18n = create<I18nState>()(
+  persist(
+    (set, get) => ({
+      language: 'vi',
+      setLanguage: (lang: Language) => set({ language: lang }),
+      t: (key) => {
+        const lang = get().language;
+        return translations[lang]?.[key] || translations.vi[key] || String(key);
+      },
+    }),
+    {
+      name: 'agro-i18n-storage',
+    }
+  )
+);
